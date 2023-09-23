@@ -15844,7 +15844,7 @@ const formatCoverageNumber = (info) => {
         : info.pct < 0
             ? 'color:red;font-weight:bold'
             : 'color:green;font-weight:bold';
-    const symbol = info.pct === 0 ? '' : info.pct < 0 ? '+' : '-';
+    const symbol = info.pct === 0 ? '' : info.pct < 0 ? '-' : '+';
     const num = Math.abs(info.pct).toFixed(2);
     return `<span style="${style}">${symbol} ${num}<span> (${info.branch.pct.toFixed(2)}%)`;
 };
@@ -15973,40 +15973,41 @@ ${increasedTable}
     if (decreasedSummaries.length === 0 && increasedSummaries.length === 0) {
         body += `
 :+1: All projects have a stable coverage!
-
+`;
+    }
+    body += `
 <details>
   <summary>Coverage diff details</summary>
 
   ${summaries.map(summary => {
-            return `
+        return `
 ## ${summary.name}
 ${(0, markdown_table_ts_1.getMarkdownTable)({
-                alignColumns: true,
-                alignment: [markdown_table_ts_1.Align.Left, markdown_table_ts_1.Align.Right, markdown_table_ts_1.Align.Right, markdown_table_ts_1.Align.Right, markdown_table_ts_1.Align.Right],
-                table: {
-                    head: ['File', 'Lines', 'Statements', 'Functions', 'Branches'],
-                    body: Object.keys(summary.coverage)
-                        .map(key => {
-                        if (key === 'total')
-                            return [];
-                        const info = summary.coverage[key];
-                        if (!info)
-                            return [];
-                        return [
-                            key.replace(`/${summary.path}`, ''),
-                            (0, format_1.formatCoverageNumber)(info.lines),
-                            (0, format_1.formatCoverageNumber)(info.statements),
-                            (0, format_1.formatCoverageNumber)(info.functions),
-                            (0, format_1.formatCoverageNumber)(info.branches)
-                        ];
-                    })
-                        .filter(s => s.length > 0)
-                }
-            })}
-`;
+            alignColumns: true,
+            alignment: [markdown_table_ts_1.Align.Left, markdown_table_ts_1.Align.Right, markdown_table_ts_1.Align.Right, markdown_table_ts_1.Align.Right, markdown_table_ts_1.Align.Right],
+            table: {
+                head: ['File', 'Lines', 'Statements', 'Functions', 'Branches'],
+                body: Object.keys(summary.coverage)
+                    .map(key => {
+                    if (key === 'total')
+                        return [];
+                    const info = summary.coverage[key];
+                    if (!info)
+                        return [];
+                    return [
+                        key.replace(`/${summary.path}`, ''),
+                        (0, format_1.formatCoverageNumber)(info.lines),
+                        (0, format_1.formatCoverageNumber)(info.statements),
+                        (0, format_1.formatCoverageNumber)(info.functions),
+                        (0, format_1.formatCoverageNumber)(info.branches)
+                    ];
+                })
+                    .filter(s => s.length > 0)
+            }
         })}
+`;
+    })}
 </details>`;
-    }
     core.info('Posting message to branch');
     const existingComment = existingComments.data.find(comment => comment.body?.startsWith(messageStart));
     if (existingComment) {
@@ -16062,10 +16063,15 @@ const core = __importStar(__nccwpck_require__(2186));
 const child_process_1 = __nccwpck_require__(2081);
 async function prepare(commands, folders) {
     const promises = Object.values(folders).map(folder => {
-        return new Promise(async (resolve, reject) => {
+        return new Promise(async (resolve) => {
             for (const command of commands) {
                 core.info(`${folder}: ${command}`);
-                (0, child_process_1.execSync)(command, { cwd: folder });
+                try {
+                    (0, child_process_1.execSync)(command, { cwd: folder });
+                }
+                catch (error) {
+                    core.error(error.message);
+                }
             }
             resolve(undefined);
         });
