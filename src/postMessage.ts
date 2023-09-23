@@ -4,7 +4,7 @@ import { ProjectSummary } from './coverage'
 import { formatChangedCoverage, formatCoverageDetails } from './utils/format'
 import { sendMessage } from './utils/github'
 
-const messageStart = 'Noodly Coverage!\n'
+const messageStart = ':ramen: Noodly Coverage! :ramen:\n'
 
 export async function postMessage(token: string, summaries: ProjectSummary[]) {
   core.info('Formatting message')

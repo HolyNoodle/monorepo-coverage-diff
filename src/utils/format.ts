@@ -25,8 +25,11 @@ export const formatCoverageDetails = (summaries: ProjectSummary[]) => {
   return `
 <details>
   <summary>Coverage diff details</summary>
+
   ${summaries.map(summary => {
-    return `## ${summary.name}
+    return `
+## ${summary.name}
+    
 ${getMarkdownTable({
   alignColumns: true,
   alignment: [Align.Left, Align.Right, Align.Right, Align.Right, Align.Right],
@@ -48,7 +51,7 @@ ${getMarkdownTable({
           formatCoverageNumber(info.branches)
         ]
       })
-      .filter(s => s.length > 0)
+      .filter(s => s.length > 1)
   }
 })}
 `})}
@@ -102,7 +105,7 @@ ${getMarkdownTable({
         formatCoverageNumber(total.functions),
         formatCoverageNumber(total.branches)
       ]
-    })
+    }).filter(s => s[0].length > 1) // Not sure why
   }
 })}`
 }

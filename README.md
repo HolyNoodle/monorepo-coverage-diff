@@ -51,10 +51,10 @@ jobs:
 
 Here is an example of the comment the action will write in the PR. The comment is updated with latest information:
 
-Noodly Coverage!
+:ramen: Noodly Coverage! :ramen:
 
 
-:warning: These projects have a decreasing coverage:
+These projects have a changing coverage:
 
 | Project |                                                          Lines |                                                     Statements |                                                      Functions |                                                       Branches |
 | :------ | -------------------------------------------------------------: | -------------------------------------------------------------: | -------------------------------------------------------------: | -------------------------------------------------------------: |

@@ -15864,7 +15864,7 @@ exports.postMessage = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const format_1 = __nccwpck_require__(6570);
 const github_1 = __nccwpck_require__(1225);
-const messageStart = 'Noodly Coverage!\n';
+const messageStart = ':ramen: Noodly Coverage! :ramen:\n';
 async function postMessage(token, summaries) {
     core.info('Formatting message');
     const body = `${messageStart}
@@ -16014,8 +16014,11 @@ const formatCoverageDetails = (summaries) => {
     return `
 <details>
   <summary>Coverage diff details</summary>
+
   ${summaries.map(summary => {
-        return `## ${summary.name}
+        return `
+## ${summary.name}
+    
 ${(0, markdown_table_ts_1.getMarkdownTable)({
             alignColumns: true,
             alignment: [markdown_table_ts_1.Align.Left, markdown_table_ts_1.Align.Right, markdown_table_ts_1.Align.Right, markdown_table_ts_1.Align.Right, markdown_table_ts_1.Align.Right],
@@ -16036,7 +16039,7 @@ ${(0, markdown_table_ts_1.getMarkdownTable)({
                         (0, exports.formatCoverageNumber)(info.branches)
                     ];
                 })
-                    .filter(s => s.length > 0)
+                    .filter(s => s.length > 1)
             }
         })}
 `;
@@ -16081,7 +16084,7 @@ ${(0, markdown_table_ts_1.getMarkdownTable)({
                     (0, exports.formatCoverageNumber)(total.functions),
                     (0, exports.formatCoverageNumber)(total.branches)
                 ];
-            })
+            }).filter(s => s[0].length > 1) // Not sure why
         }
     })}`;
 };
