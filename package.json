@@ -69,7 +69,7 @@
     "@actions/github": "^5.1.1",
     "glob": "^10.3.6",
     "markdown-table-ts": "^1.0.3",
-    "simple-git": "3.19.1"
+    "simple-git": "3.20.0"
   },
   "devDependencies": {
     "@types/jest": "^29.5.5",
