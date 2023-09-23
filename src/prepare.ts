@@ -4,10 +4,14 @@ import { Folders } from './types'
 
 export async function prepare(commands: string[], folders: Folders) {
   const promises = Object.values(folders).map(folder => {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async resolve => {
       for (const command of commands) {
         core.info(`${folder}: ${command}`)
-        execSync(command, { cwd: folder })
+        try {
+          execSync(command, { cwd: folder })
+        } catch (error: any) {
+          core.error(error.message)
+        }
       }
       resolve(undefined)
     })

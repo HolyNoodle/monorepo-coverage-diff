@@ -16063,10 +16063,15 @@ const core = __importStar(__nccwpck_require__(2186));
 const child_process_1 = __nccwpck_require__(2081);
 async function prepare(commands, folders) {
     const promises = Object.values(folders).map(folder => {
-        return new Promise(async (resolve, reject) => {
+        return new Promise(async (resolve) => {
             for (const command of commands) {
                 core.info(`${folder}: ${command}`);
-                (0, child_process_1.execSync)(command, { cwd: folder });
+                try {
+                    (0, child_process_1.execSync)(command, { cwd: folder });
+                }
+                catch (error) {
+                    core.error(error.message);
+                }
             }
             resolve(undefined);
         });
