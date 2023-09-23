@@ -51,7 +51,7 @@ ${getMarkdownTable({
           formatCoverageNumber(info.branches)
         ]
       })
-      .filter(s => s.length > 0)
+      .filter(s => s.length > 1)
   }
 })}
 `})}
@@ -105,7 +105,7 @@ ${getMarkdownTable({
         formatCoverageNumber(total.functions),
         formatCoverageNumber(total.branches)
       ]
-    }).filter(s => s[0].length < 1) // Not sure why
+    }).filter(s => s[0].length > 1) // Not sure why
   }
 })}`
 }

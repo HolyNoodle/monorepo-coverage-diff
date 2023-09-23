@@ -16039,7 +16039,7 @@ ${(0, markdown_table_ts_1.getMarkdownTable)({
                         (0, exports.formatCoverageNumber)(info.branches)
                     ];
                 })
-                    .filter(s => s.length > 0)
+                    .filter(s => s.length > 1)
             }
         })}
 `;
@@ -16084,7 +16084,7 @@ ${(0, markdown_table_ts_1.getMarkdownTable)({
                     (0, exports.formatCoverageNumber)(total.functions),
                     (0, exports.formatCoverageNumber)(total.branches)
                 ];
-            }).filter(s => s[0].length < 1) // Not sure why
+            }).filter(s => s[0].length > 1) // Not sure why
         }
     })}`;
 };
