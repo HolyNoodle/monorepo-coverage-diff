@@ -1,6 +1,9 @@
 name: 'Monorepo coverage diff'
 description: 'Monorepo coverage diff github action'
 author: 'HolyNoodle'
+branding:
+  icon: 'check'
+  color: 'green'
 
 # Define your inputs here.
 inputs:
