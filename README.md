@@ -49,4 +49,38 @@ jobs:
 
 ## PR comment
 
-TODO: Add an exhaustive example of the PR comment
+Here is an example of the comment the action will write in the PR. The comment is updated with latest information:
+
+Noodly Coverage!
+
+
+:warning: These projects have a decreasing coverage:
+
+| Project |                                                          Lines |                                                     Statements |                                                      Functions |                                                       Branches |
+| :------ | -------------------------------------------------------------: | -------------------------------------------------------------: | -------------------------------------------------------------: | -------------------------------------------------------------: |
+| project3    | <span style="color:red;font-weight:bold">- 4.18<span> (95.52%) | <span style="color:red;font-weight:bold">- 4.13<span> (95.57%) | <span style="color:red;font-weight:bold">- 4.10<span> (95.08%) | <span style="color:red;font-weight:bold">- 5.17<span> (93.10%) |
+    
+<details>
+  <summary>Coverage diff details</summary>
+
+  
+## project1
+| File                        |                                Lines |                           Statements |                            Functions |                             Branches |
+| :-------------------------- | -----------------------------------: | -----------------------------------: | -----------------------------------: | -----------------------------------: |
+| ./src/file1.ts | <span style=""> 0.00<span> (100.00%) | <span style=""> 0.00<span> (100.00%) | <span style=""> 0.00<span> (100.00%) | <span style=""> 0.00<span> (100.00%) |
+| ./src/file2.ts    |  <span style=""> 0.00<span> (81.25%) |  <span style=""> 0.00<span> (81.25%) |  <span style=""> 0.00<span> (83.33%) | <span style=""> 0.00<span> (100.00%) |
+| ./src/file3.ts      | <span style=""> 0.00<span> (100.00%) | <span style=""> 0.00<span> (100.00%) | <span style=""> 0.00<span> (100.00%) | <span style=""> 0.00<span> (100.00%) |
+
+## project2
+| File                                  |                                Lines |                           Statements |                            Functions |                             Branches |
+| :------------------------------------ | -----------------------------------: | -----------------------------------: | -----------------------------------: | -----------------------------------: |
+| ./src/file1.ts | <span style=""> 0.00<span> (100.00%) | <span style=""> 0.00<span> (100.00%) | <span style=""> 0.00<span> (100.00%) | <span style=""> 0.00<span> (100.00%) |
+| ./src/file2.ts | <span style=""> 0.00<span> (100.00%) | <span style=""> 0.00<span> (100.00%) | <span style=""> 0.00<span> (100.00%) | <span style=""> 0.00<span> (100.00%) |
+
+## project3
+| File                                  |                                                           Lines |                                                      Statements |                                                       Functions |                                                        Branches |
+| :------------------------------------ | --------------------------------------------------------------: | --------------------------------------------------------------: | --------------------------------------------------------------: | --------------------------------------------------------------: |
+| ./src/file1                |                            <span style=""> 0.00<span> (100.00%) |                            <span style=""> 0.00<span> (100.00%) |                            <span style=""> 0.00<span> (100.00%) |                             <span style=""> 0.00<span> (91.66%) |
+| ./src/file2.ts              | <span style="color:red;font-weight:bold">- 100.00<span> (0.00%) | <span style="color:red;font-weight:bold">- 100.00<span> (0.00%) | <span style="color:red;font-weight:bold">- 83.34<span> (16.66%) | <span style="color:red;font-weight:bold">- 100.00<span> (0.00%) |
+
+</details>
