@@ -1,0 +1,23 @@
+name: 'Monorepo coverage diff'
+description: ''
+author: 'HolyNoodle'
+
+# Define your inputs here.
+inputs:
+  base:
+    description: 'Base branch to compare current branch to'
+    required: false
+    default: 'main'
+  projects:
+    description: 'List of <project_name>:<project_root_dir>' 
+    required: true
+  token:
+    description: 'Github token'
+    required: true
+  commands:
+    description: 'Script to run in both branch root to generate projects coverage-summary.json'
+    required: true
+
+runs:
+  using: node20
+  main: dist/index.js
