@@ -1,16 +1,16 @@
 {
-  "name": "typescript-action",
-  "description": "GitHub Actions TypeScript template",
-  "version": "0.0.0",
-  "author": "",
+  "name": "monorepo-coverage-diff",
+  "description": "GitHub Action to ease CI coverage diff for monorepos",
+  "version": "1.0.0",
+  "author": "HolyNoodle",
   "private": true,
-  "homepage": "https://github.com/actions/typescript-action",
+  "homepage": "https://github.com/HolyNoodle/monorepo-coverage-diff",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
+    "url": "git+https://github.com/HolyNoodle/monorepo-coverage-diff"
   },
   "bugs": {
-    "url": "https://github.com/actions/typescript-action/issues"
+    "url": "https://github.com/HolyNoodle/monorepo-coverage-diff/issues"
   },
   "keywords": [
     "actions",
