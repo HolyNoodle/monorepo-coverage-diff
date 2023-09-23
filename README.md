@@ -1,199 +1,86 @@
-# Create a JavaScript Action Using TypeScript
+# Monorepository coverage diff
 
-[![GitHub Super-Linter](https://github.com/actions/typescript-action/actions/workflows/linter.yml/badge.svg)](https://github.com/super-linter/super-linter)
-![CI](https://github.com/actions/typescript-action/actions/workflows/ci.yml/badge.svg)
+## Introduction
 
-Use this template to bootstrap the creation of a TypeScript action. :rocket:
+This projects aims to provide a way to ease CI test coverage difference based on a `coverage-summary.json` file.
 
-This template includes compilation support, tests, a validation workflow,
-publishing, and versioning guidance.
+The process of the code is as follow:
+- pull base branch (default main)
+- run commands to initialize current branch and base branch coverage files (here we should run things like dependency installation, building, testing and outputing the `coverage-summary.json` file)
+- run coverage diff between current branch and base branch project by project
+- post a comment to the PR that sumarize which project has seen it's coverage changed with collapsible details
 
-If you are new, there's also a simpler introduction in the
-[Hello world JavaScript action repository](https://github.com/actions/hello-world-javascript-action).
+## Configuration
 
-## Create Your Own Action
+Example of a github workflow configuration:
+```yml
+name: Pull request
 
-To create your own action, you can use this repository as a template! Just
-follow the below instructions:
+on:
+  pull_request:
+    branches:
+      - main
 
-1. Click the **Use this template** button at the top of the repository
-1. Select **Create a new repository**
-1. Select an owner and name for your new repository
-1. Click **Create repository**
-1. Clone your new repository
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-## Initial Setup
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          cache: "yarn" # using yarn in this example, but it's just a matter of choice
 
-After you've cloned the repository to your local machine or codespace, you'll
-need to perform some initial setup steps before you can develop your action.
-
-> [!NOTE]
->
-> You'll need to have a reasonably modern version of
-> [Node.js](https://nodejs.org) handy. If you are using a version manager like
-> [`nodenv`](https://github.com/nodenv/nodenv) or
-> [`nvm`](https://github.com/nvm-sh/nvm), you can run `nodenv install` in the
-> root of your repository to install the version specified in
-> [`package.json`](./package.json). Otherwise, 20.x or later should work!
-
-1. :hammer_and_wrench: Install the dependencies
-
-   ```bash
-   npm install
-   ```
-
-1. :building_construction: Package the TypeScript for distribution
-
-   ```bash
-   npm run bundle
-   ```
-
-1. :white_check_mark: Run the tests
-
-   ```bash
-   $ npm test
-
-   PASS  ./index.test.js
-     ✓ throws invalid number (3ms)
-     ✓ wait 500 ms (504ms)
-     ✓ test runs (95ms)
-
-   ...
-   ```
-
-## Update the Action Metadata
-
-The [`action.yml`](action.yml) file defines metadata about your action, such as
-input(s) and output(s). For details about this file, see
-[Metadata syntax for GitHub Actions](https://docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions).
-
-When you copy this repository, update `action.yml` with the name, description,
-inputs, and outputs for your action.
-
-## Update the Action Code
-
-The [`src/`](./src/) directory is the heart of your action! This contains the
-source code that will be run when your action is invoked. You can replace the
-contents of this directory with your own code.
-
-There are a few things to keep in mind when writing your action code:
-
-- Most GitHub Actions toolkit and CI/CD operations are processed asynchronously.
-  In `main.ts`, you will see that the action is run in an `async` function.
-
-  ```javascript
-  import * as core from '@actions/core'
-  //...
-
-  async function run() {
-    try {
-      //...
-    } catch (error) {
-      core.setFailed(error.message)
-    }
-  }
-  ```
-
-  For more information about the GitHub Actions toolkit, see the
-  [documentation](https://github.com/actions/toolkit/blob/master/README.md).
-
-So, what are you waiting for? Go ahead and start customizing your action!
-
-1. Create a new branch
-
-   ```bash
-   git checkout -b releases/v1
-   ```
-
-1. Replace the contents of `src/` with your action code
-1. Add tests to `__tests__/` for your source code
-1. Format, test, and build the action
-
-   ```bash
-   npm run all
-   ```
-
-   > [!WARNING]
-   >
-   > This step is important! It will run [`ncc`](https://github.com/vercel/ncc)
-   > to build the final JavaScript action code with all dependencies included.
-   > If you do not run this step, your action will not work correctly when it is
-   > used in a workflow. This step also includes the `--license` option for
-   > `ncc`, which will create a license file for all of the production node
-   > modules used in your project.
-
-1. Commit your changes
-
-   ```bash
-   git add .
-   git commit -m "My first action is ready!"
-   ```
-
-1. Push them to your repository
-
-   ```bash
-   git push -u origin releases/v1
-   ```
-
-1. Create a pull request and get feedback on your action
-1. Merge the pull request into the `main` branch
-
-Your action is now published! :rocket:
-
-For information about versioning your action, see
-[Versioning](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md)
-in the GitHub Actions toolkit.
-
-## Validate the Action
-
-You can now validate the action by referencing it in a workflow file. For
-example, [`ci.yml`](./.github/workflows/ci.yml) demonstrates how to reference an
-action in the same repository.
-
-```yaml
-steps:
-  - name: Checkout
-    id: checkout
-    uses: actions/checkout@v3
-
-  - name: Test Local Action
-    id: test-action
-    uses: ./
-    with:
-      milliseconds: 1000
-
-  - name: Print Output
-    id: output
-    run: echo "${{ steps.test-action.outputs.time }}"
+      # The important part is below
+      - uses: holynoodle/monorepo-coverage-diff@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }} #required to pull the base branch and post the comment in the PR
+          base: main # default to main if not provided
+          projects: | # List of projects and path to each project, coverage file for this project will be searched at the project root
+            project1:path/to/project1
+            project2:path/to/project2
+            project3:path/to/project3
+          commands: | # List of command to run to initialize and generate the coverage file for all the projects above.
+            yarn --frozen-lockfile
+            yarn build
+            yarn ci:unit
 ```
 
-For example workflow runs, check out the
-[Actions tab](https://github.com/actions/typescript-action/actions)! :rocket:
+## PR comment
 
-## Usage
+Here is an example of the comment the action will write in the PR. The comment is updated with latest information:
 
-After testing, you can create version tag(s) that developers can use to
-reference different stable versions of your action. For more information, see
-[Versioning](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md)
-in the GitHub Actions toolkit.
+Noodly Coverage!
 
-To include the action in a workflow in another repository, you can use the
-`uses` syntax with the `@` symbol to reference a specific branch, tag, or commit
-hash.
 
-```yaml
-steps:
-  - name: Checkout
-    id: checkout
-    uses: actions/checkout@v3
+:warning: These projects have a decreasing coverage:
 
-  - name: Test Local Action
-    id: test-action
-    uses: actions/typescript-action@v1 # Commit with the `v1` tag
-    with:
-      milliseconds: 1000
+| Project |                                                          Lines |                                                     Statements |                                                      Functions |                                                       Branches |
+| :------ | -------------------------------------------------------------: | -------------------------------------------------------------: | -------------------------------------------------------------: | -------------------------------------------------------------: |
+| project3    | <span style="color:red;font-weight:bold">- 4.18<span> (95.52%) | <span style="color:red;font-weight:bold">- 4.13<span> (95.57%) | <span style="color:red;font-weight:bold">- 4.10<span> (95.08%) | <span style="color:red;font-weight:bold">- 5.17<span> (93.10%) |
+    
+<details>
+  <summary>Coverage diff details</summary>
 
-  - name: Print Output
-    id: output
-    run: echo "${{ steps.test-action.outputs.time }}"
-```
+  
+## project1
+| File                        |                                Lines |                           Statements |                            Functions |                             Branches |
+| :-------------------------- | -----------------------------------: | -----------------------------------: | -----------------------------------: | -----------------------------------: |
+| ./src/file1.ts | <span style=""> 0.00<span> (100.00%) | <span style=""> 0.00<span> (100.00%) | <span style=""> 0.00<span> (100.00%) | <span style=""> 0.00<span> (100.00%) |
+| ./src/file2.ts    |  <span style=""> 0.00<span> (81.25%) |  <span style=""> 0.00<span> (81.25%) |  <span style=""> 0.00<span> (83.33%) | <span style=""> 0.00<span> (100.00%) |
+| ./src/file3.ts      | <span style=""> 0.00<span> (100.00%) | <span style=""> 0.00<span> (100.00%) | <span style=""> 0.00<span> (100.00%) | <span style=""> 0.00<span> (100.00%) |
+
+## project2
+| File                                  |                                Lines |                           Statements |                            Functions |                             Branches |
+| :------------------------------------ | -----------------------------------: | -----------------------------------: | -----------------------------------: | -----------------------------------: |
+| ./src/file1.ts | <span style=""> 0.00<span> (100.00%) | <span style=""> 0.00<span> (100.00%) | <span style=""> 0.00<span> (100.00%) | <span style=""> 0.00<span> (100.00%) |
+| ./src/file2.ts | <span style=""> 0.00<span> (100.00%) | <span style=""> 0.00<span> (100.00%) | <span style=""> 0.00<span> (100.00%) | <span style=""> 0.00<span> (100.00%) |
+
+## project3
+| File                                  |                                                           Lines |                                                      Statements |                                                       Functions |                                                        Branches |
+| :------------------------------------ | --------------------------------------------------------------: | --------------------------------------------------------------: | --------------------------------------------------------------: | --------------------------------------------------------------: |
+| ./src/file1                |                            <span style=""> 0.00<span> (100.00%) |                            <span style=""> 0.00<span> (100.00%) |                            <span style=""> 0.00<span> (100.00%) |                             <span style=""> 0.00<span> (91.66%) |
+| ./src/file2.ts              | <span style="color:red;font-weight:bold">- 100.00<span> (0.00%) | <span style="color:red;font-weight:bold">- 100.00<span> (0.00%) | <span style="color:red;font-weight:bold">- 83.34<span> (16.66%) | <span style="color:red;font-weight:bold">- 100.00<span> (0.00%) |
+
+</details>

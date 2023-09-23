@@ -15831,28 +15831,6 @@ exports.run = run;
 
 /***/ }),
 
-/***/ 9073:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.formatCoverageNumber = void 0;
-const formatCoverageNumber = (info) => {
-    const style = info.pct === 0
-        ? ''
-        : info.pct < 0
-            ? 'color:red;font-weight:bold'
-            : 'color:green;font-weight:bold';
-    const symbol = info.pct === 0 ? '' : info.pct < 0 ? '+' : '-';
-    const num = Math.abs(info.pct).toFixed(2);
-    return `<span style="${style}">${symbol} ${num}<span> (${info.branch.pct.toFixed(2)}%)`;
-};
-exports.formatCoverageNumber = formatCoverageNumber;
-
-
-/***/ }),
-
 /***/ 9717:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -15884,144 +15862,18 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.postMessage = void 0;
 const core = __importStar(__nccwpck_require__(2186));
-const github = __importStar(__nccwpck_require__(5438));
-const markdown_table_ts_1 = __nccwpck_require__(2075);
-const format_1 = __nccwpck_require__(9073);
+const format_1 = __nccwpck_require__(6570);
+const github_1 = __nccwpck_require__(1225);
 const messageStart = 'Noodly Coverage!\n';
 async function postMessage(token, summaries) {
-    const context = github.context;
-    if (context.payload.pull_request == null) {
-        core.setFailed('No pull request found.');
-        return;
-    }
-    const pull_request_number = context.payload.pull_request.number;
-    const octokit = github.getOctokit(token);
-    const existingComments = await octokit.rest.issues.listComments({
-        ...context.repo,
-        issue_number: pull_request_number
-    });
-    let body = `${messageStart}
-`;
-    const decreasedSummaries = summaries.filter(summary => summary.coverage.total.lines.pct < 0 ||
-        summary.coverage.total.branches.pct < 0 ||
-        summary.coverage.total.statements.pct < 0 ||
-        summary.coverage.total.functions.pct < 0);
-    if (decreasedSummaries.length > 0) {
-        const decreasedTable = (0, markdown_table_ts_1.getMarkdownTable)({
-            alignColumns: true,
-            alignment: [
-                markdown_table_ts_1.Align.Left,
-                markdown_table_ts_1.Align.Right,
-                markdown_table_ts_1.Align.Right,
-                markdown_table_ts_1.Align.Right,
-                markdown_table_ts_1.Align.Right
-            ],
-            table: {
-                head: ['Project', 'Lines', 'Statements', 'Functions', 'Branches'],
-                body: decreasedSummaries.map(summary => {
-                    const { total } = summary.coverage;
-                    return [
-                        summary.name,
-                        (0, format_1.formatCoverageNumber)(total.lines),
-                        (0, format_1.formatCoverageNumber)(total.statements),
-                        (0, format_1.formatCoverageNumber)(total.functions),
-                        (0, format_1.formatCoverageNumber)(total.branches)
-                    ];
-                })
-            }
-        });
-        body += `
-:warning: These projects have a decreasing coverage:
+    core.info('Formatting message');
+    const body = `${messageStart}
 
-${decreasedTable}
-    `;
-    }
-    const increasedSummaries = summaries.filter(summary => summary.coverage.total.lines.pct > 0 ||
-        summary.coverage.total.branches.pct > 0 ||
-        summary.coverage.total.statements.pct > 0 ||
-        summary.coverage.total.functions.pct > 0);
-    if (increasedSummaries.length > 0) {
-        const increasedTable = (0, markdown_table_ts_1.getMarkdownTable)({
-            alignColumns: true,
-            alignment: [
-                markdown_table_ts_1.Align.Left,
-                markdown_table_ts_1.Align.Right,
-                markdown_table_ts_1.Align.Right,
-                markdown_table_ts_1.Align.Right,
-                markdown_table_ts_1.Align.Right
-            ],
-            table: {
-                head: ['Project', 'Lines', 'Statements', 'Functions', 'Branches'],
-                body: decreasedSummaries.map(summary => {
-                    const { total } = summary.coverage;
-                    return [
-                        summary.name,
-                        (0, format_1.formatCoverageNumber)(total.lines),
-                        (0, format_1.formatCoverageNumber)(total.statements),
-                        (0, format_1.formatCoverageNumber)(total.functions),
-                        (0, format_1.formatCoverageNumber)(total.branches)
-                    ];
-                })
-            }
-        });
-        body += `
-:fire: These projects have an increasing coverage:
-
-${increasedTable}
-    `;
-    }
-    if (decreasedSummaries.length === 0 && increasedSummaries.length === 0) {
-        body += `
-:+1: All projects have a stable coverage!
-
-<details>
-  <summary>Coverage diff details</summary>
-
-  ${summaries.map(summary => {
-            return `
-## ${summary.name}
-${(0, markdown_table_ts_1.getMarkdownTable)({
-                alignColumns: true,
-                alignment: [markdown_table_ts_1.Align.Left, markdown_table_ts_1.Align.Right, markdown_table_ts_1.Align.Right, markdown_table_ts_1.Align.Right, markdown_table_ts_1.Align.Right],
-                table: {
-                    head: ['File', 'Lines', 'Statements', 'Functions', 'Branches'],
-                    body: Object.keys(summary.coverage)
-                        .map(key => {
-                        if (key === 'total')
-                            return [];
-                        const info = summary.coverage[key];
-                        if (!info)
-                            return [];
-                        return [
-                            key.replace(`/${summary.path}`, ''),
-                            (0, format_1.formatCoverageNumber)(info.lines),
-                            (0, format_1.formatCoverageNumber)(info.statements),
-                            (0, format_1.formatCoverageNumber)(info.functions),
-                            (0, format_1.formatCoverageNumber)(info.branches)
-                        ];
-                    })
-                        .filter(s => s.length > 0)
-                }
-            })}
-`;
-        })}
-</details>`;
-    }
+  ${(0, format_1.formatChangedCoverage)(summaries)}
+  
+  ${(0, format_1.formatCoverageDetails)(summaries)}`;
     core.info('Posting message to branch');
-    const existingComment = existingComments.data.find(comment => comment.body?.startsWith(messageStart));
-    if (existingComment) {
-        await octokit.rest.issues.updateComment({
-            ...context.repo,
-            comment_id: existingComment.id,
-            body
-        });
-        return;
-    }
-    await octokit.rest.issues.createComment({
-        ...context.repo,
-        issue_number: pull_request_number,
-        body
-    });
+    await (0, github_1.sendMessage)(token, messageStart, body);
 }
 exports.postMessage = postMessage;
 
@@ -16061,22 +15913,19 @@ exports.prepare = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const child_process_1 = __nccwpck_require__(2081);
 async function prepare(commands, folders) {
-    const promises = Object.values(folders).map(folder => {
-        return new Promise(async (resolve, reject) => {
-            for (const command of commands) {
-                core.info(`${folder}: ${command}`);
-                (0, child_process_1.execSync)(command, { cwd: folder });
+    for (const folder of Object.values(folders)) {
+        for (const command of commands) {
+            core.info(`${folder}: ${command}`);
+            try {
+                const buffer = (0, child_process_1.execSync)(command, { cwd: folder });
+                core.info(buffer.toString());
             }
-            resolve(undefined);
-        });
-    });
-    try {
-        await Promise.all(promises);
-    }
-    catch (error) {
-        // Fail the workflow run if an error occurs
-        if (error instanceof Error)
-            console.error(error.message);
+            catch (error) {
+                if (error instanceof Error)
+                    core.setFailed(error.message);
+                core.error(error.toString());
+            }
+        }
     }
 }
 exports.prepare = prepare;
@@ -16138,6 +15987,169 @@ async function pullBranch(token, branchName, folder) {
     }
 }
 exports.pullBranch = pullBranch;
+
+
+/***/ }),
+
+/***/ 6570:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.formatChangedCoverage = exports.formatCoverageDetails = exports.formatCoverageNumber = void 0;
+const markdown_table_ts_1 = __nccwpck_require__(2075);
+const formatCoverageNumber = (info) => {
+    const style = info.pct === 0
+        ? ''
+        : info.pct < 0
+            ? 'color:red;font-weight:bold'
+            : 'color:green;font-weight:bold';
+    const symbol = info.pct === 0 ? '' : info.pct < 0 ? '-' : '+';
+    const num = Math.abs(info.pct).toFixed(2);
+    return `<span style="${style}">${symbol} ${num}<span> (${info.branch.pct.toFixed(2)}%)`;
+};
+exports.formatCoverageNumber = formatCoverageNumber;
+const formatCoverageDetails = (summaries) => {
+    return `
+<details>
+  <summary>Coverage diff details</summary>
+  ${summaries.map(summary => {
+        return `## ${summary.name}
+${(0, markdown_table_ts_1.getMarkdownTable)({
+            alignColumns: true,
+            alignment: [markdown_table_ts_1.Align.Left, markdown_table_ts_1.Align.Right, markdown_table_ts_1.Align.Right, markdown_table_ts_1.Align.Right, markdown_table_ts_1.Align.Right],
+            table: {
+                head: ['File', 'Lines', 'Statements', 'Functions', 'Branches'],
+                body: Object.keys(summary.coverage)
+                    .map(key => {
+                    if (key === 'total')
+                        return [];
+                    const info = summary.coverage[key];
+                    if (!info)
+                        return [];
+                    return [
+                        key.replace(`/${summary.path}`, ''),
+                        (0, exports.formatCoverageNumber)(info.lines),
+                        (0, exports.formatCoverageNumber)(info.statements),
+                        (0, exports.formatCoverageNumber)(info.functions),
+                        (0, exports.formatCoverageNumber)(info.branches)
+                    ];
+                })
+                    .filter(s => s.length > 0)
+            }
+        })}
+`;
+    })}
+</details>`;
+};
+exports.formatCoverageDetails = formatCoverageDetails;
+const formatChangedCoverage = (summaries) => {
+    const changedSummaries = summaries
+        .filter(summary => summary.coverage.total.lines.pct !== 0 ||
+        summary.coverage.total.branches.pct !== 0 ||
+        summary.coverage.total.statements.pct !== 0 ||
+        summary.coverage.total.functions.pct !== 0)
+        .sort((a, b) => {
+        const aTotal = a.coverage.total;
+        const bTotal = b.coverage.total;
+        const aPct = aTotal.lines.pct +
+            aTotal.branches.pct +
+            aTotal.statements.pct +
+            aTotal.functions.pct;
+        const bPct = bTotal.lines.pct +
+            bTotal.branches.pct +
+            bTotal.statements.pct +
+            bTotal.functions.pct;
+        return bPct - aPct;
+    });
+    if (changedSummaries.length === 0) {
+        return ":+1: All projects have a non changing coverage!";
+    }
+    return `These projects have a changing coverage:
+${(0, markdown_table_ts_1.getMarkdownTable)({
+        alignColumns: true,
+        alignment: [markdown_table_ts_1.Align.Left, markdown_table_ts_1.Align.Right, markdown_table_ts_1.Align.Right, markdown_table_ts_1.Align.Right, markdown_table_ts_1.Align.Right],
+        table: {
+            head: ['Project', 'Lines', 'Statements', 'Functions', 'Branches'],
+            body: changedSummaries.map(summary => {
+                const { total } = summary.coverage;
+                return [
+                    summary.name,
+                    (0, exports.formatCoverageNumber)(total.lines),
+                    (0, exports.formatCoverageNumber)(total.statements),
+                    (0, exports.formatCoverageNumber)(total.functions),
+                    (0, exports.formatCoverageNumber)(total.branches)
+                ];
+            })
+        }
+    })}`;
+};
+exports.formatChangedCoverage = formatChangedCoverage;
+
+
+/***/ }),
+
+/***/ 1225:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.sendMessage = void 0;
+const core = __importStar(__nccwpck_require__(2186));
+const github = __importStar(__nccwpck_require__(5438));
+const sendMessage = async (token, messageStart, body) => {
+    const context = github.context;
+    if (context.payload.pull_request == null) {
+        core.info('No pull request found.');
+        return;
+    }
+    const pull_request_number = context.payload.pull_request.number;
+    const octokit = github.getOctokit(token);
+    const existingComments = await octokit.rest.issues.listComments({
+        ...context.repo,
+        issue_number: pull_request_number
+    });
+    const existingComment = existingComments.data.find(comment => comment.body?.startsWith(messageStart));
+    if (existingComment) {
+        await octokit.rest.issues.updateComment({
+            ...context.repo,
+            comment_id: existingComment.id,
+            body
+        });
+        return;
+    }
+    await octokit.rest.issues.createComment({
+        ...context.repo,
+        issue_number: pull_request_number,
+        body
+    });
+};
+exports.sendMessage = sendMessage;
 
 
 /***/ }),
