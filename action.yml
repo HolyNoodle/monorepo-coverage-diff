@@ -1,5 +1,5 @@
 name: 'Monorepo coverage diff'
-description: ''
+description: 'Monorepo coverage diff github action'
 author: 'HolyNoodle'
 
 # Define your inputs here.
