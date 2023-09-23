@@ -112,7 +112,10 @@ ${increasedTable}
   if (decreasedSummaries.length === 0 && increasedSummaries.length === 0) {
     body += `
 :+1: All projects have a stable coverage!
+`
+  }
 
+  body += `
 <details>
   <summary>Coverage diff details</summary>
 
@@ -146,7 +149,6 @@ ${getMarkdownTable({
 `
   })}
 </details>`
-  }
 
   core.info('Posting message to branch')
   const existingComment = existingComments.data.find(
