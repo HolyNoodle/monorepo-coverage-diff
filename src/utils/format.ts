@@ -1,3 +1,5 @@
+import * as core from '@actions/core'
+
 import { Align, getMarkdownTable } from 'markdown-table-ts'
 
 import {
@@ -42,6 +44,8 @@ ${getMarkdownTable({
         const info = summary.coverage[key as keyof typeof summary.coverage]
 
         if (!info) return []
+
+        core.info(`Coverage for ${key}: ${JSON.stringify(info)}`)
 
         return [
           key.replace(`/${summary.path}`, ''),
