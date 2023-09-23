@@ -8,7 +8,7 @@ The process of the code is as follow:
 - pull base branch (default main)
 - run commands to initialize current branch and base branch coverage files (here we should run things like dependency installation, building, testing and outputing the `coverage-summary.json` file)
 - run coverage diff between current branch and base branch project by project
-- post a comment to the PR that sumarize the which project has seen it's coverage changed
+- post a comment to the PR that sumarize which project has seen it's coverage changed with collapsible details
 
 ## Configuration
 
@@ -47,3 +47,6 @@ jobs:
             yarn ci:unit
 ```
 
+## PR comment
+
+TODO: Add an exhaustive example of the PR comment
