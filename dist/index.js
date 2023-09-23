@@ -15864,7 +15864,7 @@ exports.postMessage = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const format_1 = __nccwpck_require__(6570);
 const github_1 = __nccwpck_require__(1225);
-const messageStart = 'Noodly Coverage!\n';
+const messageStart = ':ramen: Noodly Coverage! :ramen:\n';
 async function postMessage(token, summaries) {
     core.info('Formatting message');
     const body = `${messageStart}
