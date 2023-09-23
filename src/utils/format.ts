@@ -25,8 +25,11 @@ export const formatCoverageDetails = (summaries: ProjectSummary[]) => {
   return `
 <details>
   <summary>Coverage diff details</summary>
+
   ${summaries.map(summary => {
-    return `## ${summary.name}
+    return `
+## ${summary.name}
+    
 ${getMarkdownTable({
   alignColumns: true,
   alignment: [Align.Left, Align.Right, Align.Right, Align.Right, Align.Right],

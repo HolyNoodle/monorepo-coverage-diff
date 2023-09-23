@@ -16014,8 +16014,11 @@ const formatCoverageDetails = (summaries) => {
     return `
 <details>
   <summary>Coverage diff details</summary>
+
   ${summaries.map(summary => {
-        return `## ${summary.name}
+        return `
+## ${summary.name}
+    
 ${(0, markdown_table_ts_1.getMarkdownTable)({
             alignColumns: true,
             alignment: [markdown_table_ts_1.Align.Left, markdown_table_ts_1.Align.Right, markdown_table_ts_1.Align.Right, markdown_table_ts_1.Align.Right, markdown_table_ts_1.Align.Right],
