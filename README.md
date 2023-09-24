@@ -33,7 +33,7 @@ jobs:
           cache: "yarn" # using yarn in this example, but it's just a matter of choice
 
       # The important part is below
-      - uses: holynoodle/monorepo-coverage-diff@v1
+      - uses: holynoodle/monorepo-coverage-diff@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }} #required to pull the base branch and post the comment in the PR
           base: main # default to main if not provided
