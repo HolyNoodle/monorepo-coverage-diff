@@ -83,7 +83,7 @@ export async function computeCoverage(
       core.debug('BRANCH:\n' + JSON.stringify(branch))
 
       const computeCoverage = (
-        base: CoverageInfo,
+        base: CoverageInfo = { total: 0, covered: 0, skipped: 0, pct: 0 },
         branch: CoverageInfo
       ): ExtendedCoverageInfo => {
         return {
@@ -98,21 +98,11 @@ export async function computeCoverage(
         base: Coverage | undefined,
         branch: Coverage
       ): Coverage => {
-        // Added file
-        if (!base) {
-          return {
-            branches: branch.branches,
-            functions: branch.functions,
-            lines: branch.lines,
-            statements: branch.statements
-          }
-        }
-
         return {
-          branches: computeCoverage(base.branches, branch.branches),
-          functions: computeCoverage(base.functions, branch.functions),
-          lines: computeCoverage(base.lines, branch.lines),
-          statements: computeCoverage(base.statements, branch.statements)
+          branches: computeCoverage(base?.branches, branch.branches),
+          functions: computeCoverage(base?.functions, branch.functions),
+          lines: computeCoverage(base?.lines, branch.lines),
+          statements: computeCoverage(base?.statements, branch.statements)
         }
       }
 
