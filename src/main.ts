@@ -11,6 +11,7 @@ import { postMessage } from './postMessage'
 export async function run(): Promise<void> {
   try {
     const baseBranch = core.getInput('base') || 'main'
+    const group = core.getInput('group')
     const commands = core.getInput('commands').split('\n')
     const github_token = core.getInput('token')
     const projects = core
@@ -37,7 +38,7 @@ export async function run(): Promise<void> {
 
     core.debug(`Computed coverage:\n${JSON.stringify(summaries)}`)
 
-    await postMessage(github_token, summaries)
+    await postMessage(github_token, summaries, group)
   } catch (error) {
     // Fail the workflow run if an error occurs
     if (error instanceof Error) core.setFailed(error.message)

@@ -11,6 +11,10 @@ inputs:
     description: 'Base branch to compare current branch to'
     required: false
     default: 'main'
+  group:
+    description: 'Group will help isolate actions comments'
+    required: false
+    default: ''
   projects:
     description: 'List of <project_name>:<project_root_dir>' 
     required: true

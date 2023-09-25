@@ -4,9 +4,16 @@ import { ProjectSummary } from './coverage'
 import { formatChangedCoverage, formatCoverageDetails } from './utils/format'
 import { sendMessage } from './utils/github'
 
-const messageStart = ':ramen: Noodly Coverage! :ramen:\n'
+const messageStartCreator = (group: string) =>
+  `:ramen: Noodly Coverage${group === '' ? '' : ` for ${group}`}! :ramen:\n`
 
-export async function postMessage(token: string, summaries: ProjectSummary[]) {
+export async function postMessage(
+  token: string,
+  summaries: ProjectSummary[],
+  group: string
+) {
+  const messageStart = messageStartCreator(group)
+  
   core.info('Formatting message')
   try {
     const body = `${messageStart}
