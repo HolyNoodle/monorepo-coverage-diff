@@ -15695,13 +15695,22 @@ async function computeCoverage(projects, folders) {
             const basePath = path_1.default.join(folders.base, project.path);
             const [branchCoverageFile] = glob_1.glob.globSync(`${branchPath}/**/coverage-summary.json`);
             const [baseCoverageFile] = glob_1.glob.globSync(`${basePath}/**/coverage-summary.json`);
-            if (!branchCoverageFile || !baseCoverageFile) {
-                core.setFailed(`Could not find coverage-summary.json for ${project.name}`);
+            if (!branchCoverageFile) {
+                core.setFailed(`Could not find BRANCH coverage-summary.json for ${project.name}`);
                 reject();
                 return;
             }
+            if (!baseCoverageFile) {
+                core.setFailed(`Could not find BASE coverage-summary.json for ${project.name}`);
+                reject();
+                return;
+            }
+            core.debug(`Found BRANCH coverage-summary.json for ${project.name} at ${branchCoverageFile}`);
+            core.debug(`Found BASE coverage-summary.json for ${project.name} at ${baseCoverageFile}`);
             const base = JSON.parse((0, fs_1.readFileSync)(baseCoverageFile).toString());
             const branch = JSON.parse((0, fs_1.readFileSync)(branchCoverageFile).toString());
+            core.debug('BASE:\n' + JSON.stringify(base));
+            core.debug('BRANCH:\n' + JSON.stringify(branch));
             const computeCoverage = (base, branch) => {
                 return {
                     pct: branch.pct - base.pct,
@@ -15728,17 +15737,26 @@ async function computeCoverage(projects, folders) {
                     statements: computeCoverage(base.statements, branch.statements)
                 };
             };
-            const rootDir = process.cwd();
             const baseMap = Object.keys(base).reduce((acc, key) => {
+                if (key === 'total')
+                    return {
+                        ...acc,
+                        total: base.total
+                    };
                 return {
                     ...acc,
                     [key.replace(folders.base, '.')]: base[key]
                 };
             }, {});
             const branchMap = Object.keys(branch).reduce((acc, key) => {
+                if (key === 'total')
+                    return {
+                        ...acc,
+                        total: branch.total
+                    };
                 return {
                     ...acc,
-                    [key.replace(rootDir, '.')]: branch[key]
+                    [key.replace(folders.branch, '.')]: branch[key]
                 };
             }, {});
             resolve({
@@ -15812,12 +15830,13 @@ async function run() {
             path: projectStr.split(':')[1]
         }));
         const folders = {
-            branch: '.',
+            branch: process.cwd(),
             base: '/tmp/base'
         };
         await (0, pull_branch_1.pullBranch)(github_token, baseBranch, folders.base);
         await (0, prepare_1.prepare)(commands, folders);
         const summaries = await (0, coverage_1.computeCoverage)(projects, folders);
+        core.debug(`Computed coverage:\n${JSON.stringify(summaries)}`);
         await (0, postMessage_1.postMessage)(github_token, summaries);
     }
     catch (error) {
@@ -15867,13 +15886,18 @@ const github_1 = __nccwpck_require__(1225);
 const messageStart = ':ramen: Noodly Coverage! :ramen:\n';
 async function postMessage(token, summaries) {
     core.info('Formatting message');
-    const body = `${messageStart}
+    try {
+        const body = `${messageStart}
 
   ${(0, format_1.formatChangedCoverage)(summaries)}
   
   ${(0, format_1.formatCoverageDetails)(summaries)}`;
-    core.info('Posting message to branch');
-    await (0, github_1.sendMessage)(token, messageStart, body);
+        core.info('Posting message to branch');
+        await (0, github_1.sendMessage)(token, messageStart, body);
+    }
+    catch (error) {
+        core.error(error.messge + '\n' + JSON.stringify(error.stack));
+    }
 }
 exports.postMessage = postMessage;
 

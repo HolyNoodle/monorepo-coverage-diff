@@ -79,8 +79,8 @@ export async function computeCoverage(
       const base = JSON.parse(readFileSync(baseCoverageFile).toString())
       const branch = JSON.parse(readFileSync(branchCoverageFile).toString())
 
-      core.debug("BASE:\n" + JSON.stringify(base));
-      core.debug("BRANCH:\n" + JSON.stringify(branch));
+      core.debug('BASE:\n' + JSON.stringify(base))
+      core.debug('BRANCH:\n' + JSON.stringify(branch))
 
       const computeCoverage = (
         base: CoverageInfo,
@@ -117,10 +117,11 @@ export async function computeCoverage(
       }
 
       const baseMap = Object.keys(base).reduce((acc, key) => {
-        if(key === 'total') return {
-          ...acc,
-          total: base.total
-        }
+        if (key === 'total')
+          return {
+            ...acc,
+            total: base.total
+          }
 
         return {
           ...acc,
@@ -128,10 +129,11 @@ export async function computeCoverage(
         }
       }, {} as CoverageSummary)
       const branchMap = Object.keys(branch).reduce((acc, key) => {
-        if(key === 'total') return {
-          ...acc,
-          total: branch.total
-        }
+        if (key === 'total')
+          return {
+            ...acc,
+            total: branch.total
+          }
 
         return {
           ...acc,
