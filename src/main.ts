@@ -25,7 +25,7 @@ export async function run(): Promise<void> {
       )
 
     const folders = {
-      branch: '.',
+      branch: process.cwd(),
       base: '/tmp/base'
     }
 

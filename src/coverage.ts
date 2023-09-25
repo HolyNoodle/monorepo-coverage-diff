@@ -116,9 +116,6 @@ export async function computeCoverage(
         }
       }
 
-      const rootDir = process.cwd()
-      core.debug(`rootDir: ${rootDir}`)
-
       const baseMap = Object.keys(base).reduce((acc, key) => {
         if(key === 'total') return {
           ...acc,
@@ -138,7 +135,7 @@ export async function computeCoverage(
 
         return {
           ...acc,
-          [key.replace(rootDir, '.')]: branch[key]
+          [key.replace(folders.branch, '.')]: branch[key]
         }
       }, {} as CoverageSummary)
 
