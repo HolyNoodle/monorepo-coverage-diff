@@ -15811,6 +15811,7 @@ const postMessage_1 = __nccwpck_require__(9717);
 async function run() {
     try {
         const baseBranch = core.getInput('base') || 'main';
+        const group = core.getInput('group');
         const commands = core.getInput('commands').split('\n');
         const github_token = core.getInput('token');
         const projects = core
@@ -15828,7 +15829,7 @@ async function run() {
         await (0, prepare_1.prepare)(commands, folders);
         const summaries = await (0, coverage_1.computeCoverage)(projects, folders);
         core.debug(`Computed coverage:\n${JSON.stringify(summaries)}`);
-        await (0, postMessage_1.postMessage)(github_token, summaries);
+        await (0, postMessage_1.postMessage)(github_token, summaries, group);
     }
     catch (error) {
         // Fail the workflow run if an error occurs
@@ -15874,8 +15875,9 @@ exports.postMessage = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const format_1 = __nccwpck_require__(6570);
 const github_1 = __nccwpck_require__(1225);
-const messageStart = ':ramen: Noodly Coverage! :ramen:\n';
-async function postMessage(token, summaries) {
+const messageStartCreator = (group) => `:ramen: Noodly Coverage${group === '' ? '' : ` for ${group}`}! :ramen:\n`;
+async function postMessage(token, summaries, group) {
+    const messageStart = messageStartCreator(group);
     core.info('Formatting message');
     try {
         const body = `${messageStart}

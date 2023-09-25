@@ -13,7 +13,7 @@ export async function postMessage(
   group: string
 ) {
   const messageStart = messageStartCreator(group)
-  
+
   core.info('Formatting message')
   try {
     const body = `${messageStart}
