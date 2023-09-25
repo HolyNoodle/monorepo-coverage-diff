@@ -35,6 +35,8 @@ export async function run(): Promise<void> {
 
     const summaries = await computeCoverage(projects, folders)
 
+    core.debug(`Computed coverage:\n${JSON.stringify(summaries)}`);
+
     await postMessage(github_token, summaries)
   } catch (error) {
     // Fail the workflow run if an error occurs

@@ -52,17 +52,35 @@ export async function computeCoverage(
         `${basePath}/**/coverage-summary.json`
       )
 
-      if (!branchCoverageFile || !baseCoverageFile) {
+      if (!branchCoverageFile) {
         core.setFailed(
-          `Could not find coverage-summary.json for ${project.name}`
+          `Could not find BRANCH coverage-summary.json for ${project.name}`
+        )
+
+        reject()
+        return
+      }
+      if (!baseCoverageFile) {
+        core.setFailed(
+          `Could not find BASE coverage-summary.json for ${project.name}`
         )
 
         reject()
         return
       }
 
+      core.debug(
+        `Found BRANCH coverage-summary.json for ${project.name} at ${branchCoverageFile}`
+      )
+      core.debug(
+        `Found BASE coverage-summary.json for ${project.name} at ${baseCoverageFile}`
+      )
+
       const base = JSON.parse(readFileSync(baseCoverageFile).toString())
       const branch = JSON.parse(readFileSync(branchCoverageFile).toString())
+
+      core.debug("BASE:\n" + JSON.stringify(base));
+      core.debug("BRANCH:\n" + JSON.stringify(branch));
 
       const computeCoverage = (
         base: CoverageInfo,
@@ -99,13 +117,25 @@ export async function computeCoverage(
       }
 
       const rootDir = process.cwd()
+      core.debug(`rootDir: ${rootDir}`)
+
       const baseMap = Object.keys(base).reduce((acc, key) => {
+        if(key === 'total') return {
+          ...acc,
+          total: base.total
+        }
+
         return {
           ...acc,
           [key.replace(folders.base, '.')]: base[key]
         }
       }, {} as CoverageSummary)
       const branchMap = Object.keys(branch).reduce((acc, key) => {
+        if(key === 'total') return {
+          ...acc,
+          total: branch.total
+        }
+
         return {
           ...acc,
           [key.replace(rootDir, '.')]: branch[key]
