@@ -15896,7 +15896,7 @@ async function postMessage(token, summaries) {
         await (0, github_1.sendMessage)(token, messageStart, body);
     }
     catch (error) {
-        core.error(error.messge + '\n' + JSON.stringify(error.stack));
+        core.error(error.message + '\n' + JSON.stringify(error.stack));
     }
 }
 exports.postMessage = postMessage;
@@ -16031,7 +16031,7 @@ const formatCoverageNumber = (info) => {
             : 'color:green;font-weight:bold';
     const symbol = info.pct === 0 ? '' : info.pct < 0 ? '-' : '+';
     const num = Math.abs(info.pct).toFixed(2);
-    return `<span style="${style}">${symbol} ${num}<span> (${info.branch.pct.toFixed(2)}%)`;
+    return `<span style="${style}">${symbol} ${num}<span> (${info.branch?.pct.toFixed(2) ?? '??'}%)`;
 };
 exports.formatCoverageNumber = formatCoverageNumber;
 const formatCoverageDetails = (summaries) => {
@@ -16051,10 +16051,10 @@ ${(0, markdown_table_ts_1.getMarkdownTable)({
                 body: Object.keys(summary.coverage)
                     .map(key => {
                     if (key === 'total')
-                        return [];
+                        return undefined;
                     const info = summary.coverage[key];
                     if (!info)
-                        return [];
+                        return undefined;
                     return [
                         key.replace(`/${summary.path}`, ''),
                         (0, exports.formatCoverageNumber)(info.lines),
@@ -16063,7 +16063,16 @@ ${(0, markdown_table_ts_1.getMarkdownTable)({
                         (0, exports.formatCoverageNumber)(info.branches)
                     ];
                 })
-                    .filter(s => s.length > 1)
+                    .filter(s => !!s)
+                    .concat([
+                    [
+                        'total',
+                        (0, exports.formatCoverageNumber)(summary.coverage.total.lines),
+                        (0, exports.formatCoverageNumber)(summary.coverage.total.statements),
+                        (0, exports.formatCoverageNumber)(summary.coverage.total.functions),
+                        (0, exports.formatCoverageNumber)(summary.coverage.total.branches)
+                    ]
+                ])
             }
         })}
 `;
@@ -16091,7 +16100,7 @@ const formatChangedCoverage = (summaries) => {
         return bPct - aPct;
     });
     if (changedSummaries.length === 0) {
-        return ":+1: All projects have a non changing coverage!";
+        return ':+1: All projects have a non changing coverage!';
     }
     return `These projects have a changing coverage:
 ${(0, markdown_table_ts_1.getMarkdownTable)({
@@ -16099,7 +16108,8 @@ ${(0, markdown_table_ts_1.getMarkdownTable)({
         alignment: [markdown_table_ts_1.Align.Left, markdown_table_ts_1.Align.Right, markdown_table_ts_1.Align.Right, markdown_table_ts_1.Align.Right, markdown_table_ts_1.Align.Right],
         table: {
             head: ['Project', 'Lines', 'Statements', 'Functions', 'Branches'],
-            body: changedSummaries.map(summary => {
+            body: changedSummaries
+                .map(summary => {
                 const { total } = summary.coverage;
                 return [
                     summary.name,
@@ -16108,7 +16118,8 @@ ${(0, markdown_table_ts_1.getMarkdownTable)({
                     (0, exports.formatCoverageNumber)(total.functions),
                     (0, exports.formatCoverageNumber)(total.branches)
                 ];
-            }).filter(s => s[0].length > 1) // Not sure why
+            })
+                .filter(s => s[0].length > 1) // Not sure why
         }
     })}`;
 };

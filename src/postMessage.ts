@@ -18,6 +18,6 @@ export async function postMessage(token: string, summaries: ProjectSummary[]) {
     core.info('Posting message to branch')
     await sendMessage(token, messageStart, body)
   } catch (error: any) {
-    core.error(error.messge + '\n' + JSON.stringify(error.stack))
+    core.error(error.message + '\n' + JSON.stringify(error.stack))
   }
 }

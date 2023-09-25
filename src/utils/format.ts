@@ -1,9 +1,6 @@
 import { Align, getMarkdownTable } from 'markdown-table-ts'
 
-import {
-  ExtendedCoverageInfo,
-  ProjectSummary
-} from 'src/coverage'
+import { ExtendedCoverageInfo, ProjectSummary } from 'src/coverage'
 
 export const formatCoverageNumber = (info: ExtendedCoverageInfo) => {
   const style =
@@ -16,9 +13,9 @@ export const formatCoverageNumber = (info: ExtendedCoverageInfo) => {
   const symbol = info.pct === 0 ? '' : info.pct < 0 ? '-' : '+'
 
   const num = Math.abs(info.pct).toFixed(2)
-  return `<span style="${style}">${symbol} ${num}<span> (${info.branch.pct.toFixed(
-    2
-  )}%)`
+  return `<span style="${style}">${symbol} ${num}<span> (${
+    info.branch?.pct.toFixed(2) ?? '??'
+  }%)`
 }
 
 export const formatCoverageDetails = (summaries: ProjectSummary[]) => {
@@ -37,11 +34,11 @@ ${getMarkdownTable({
     head: ['File', 'Lines', 'Statements', 'Functions', 'Branches'],
     body: Object.keys(summary.coverage)
       .map(key => {
-        if (key === 'total') return []
+        if (key === 'total') return undefined
 
         const info = summary.coverage[key as keyof typeof summary.coverage]
 
-        if (!info) return []
+        if (!info) return undefined
 
         return [
           key.replace(`/${summary.path}`, ''),
@@ -51,10 +48,20 @@ ${getMarkdownTable({
           formatCoverageNumber(info.branches)
         ]
       })
-      .filter(s => s.length > 1)
+      .filter(s => !!s)
+      .concat([
+        [
+          'total',
+          formatCoverageNumber(summary.coverage.total.lines),
+          formatCoverageNumber(summary.coverage.total.statements),
+          formatCoverageNumber(summary.coverage.total.functions),
+          formatCoverageNumber(summary.coverage.total.branches)
+        ]
+      ]) as string[][]
   }
 })}
-`})}
+`
+  })}
 </details>`
 }
 
@@ -86,7 +93,7 @@ export const formatChangedCoverage = (summaries: ProjectSummary[]) => {
     })
 
   if (changedSummaries.length === 0) {
-    return ":+1: All projects have a non changing coverage!"
+    return ':+1: All projects have a non changing coverage!'
   }
 
   return `These projects have a changing coverage:
@@ -95,17 +102,19 @@ ${getMarkdownTable({
   alignment: [Align.Left, Align.Right, Align.Right, Align.Right, Align.Right],
   table: {
     head: ['Project', 'Lines', 'Statements', 'Functions', 'Branches'],
-    body: changedSummaries.map(summary => {
-      const { total } = summary.coverage
+    body: changedSummaries
+      .map(summary => {
+        const { total } = summary.coverage
 
-      return [
-        summary.name,
-        formatCoverageNumber(total.lines),
-        formatCoverageNumber(total.statements),
-        formatCoverageNumber(total.functions),
-        formatCoverageNumber(total.branches)
-      ]
-    }).filter(s => s[0].length > 1) // Not sure why
+        return [
+          summary.name,
+          formatCoverageNumber(total.lines),
+          formatCoverageNumber(total.statements),
+          formatCoverageNumber(total.functions),
+          formatCoverageNumber(total.branches)
+        ]
+      })
+      .filter(s => s[0].length > 1) // Not sure why
   }
 })}`
 }
