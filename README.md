@@ -91,12 +91,33 @@ These projects have a changing coverage:
 
 When you want to reduce the number of installs and builds, the action leave you the opportunity to only run diffs
 ```yml
-- uses: holynoodle/monorepo-coverage-diff@v6
-  with:
-    token: ${{ secrets.GITHUB_TOKEN }}
-    projects: |
-      project1:path/to/project1
-      project2:path/to/project2
-      project3:path/to/project3
-    diffOnly: true
+steps:
+  - uses: actions/checkout@v3
+    with:
+      path: ./branch
+  - uses: actions/checkout@v3
+    with:
+      ref: main
+      path: ./base
+
+  - name: Use Node.js ${{ matrix.node-version }}
+    uses: actions/setup-node@v3
+    with:
+      node-version: ${{ matrix.node-version }}
+
+  - run: yarn --frozen-lockfile && yarn build && yarn ci:unit
+    working-directory: ./base
+  - run: yarn --frozen-lockfile && yarn build && yarn ci:unit
+    working-directory: ./branch
+
+  - uses: holynoodle/monorepo-coverage-diff@v6
+    with:
+      token: ${{ secrets.GITHUB_TOKEN }}
+      basePath: ./base
+      branchPath: ./branch
+      projects: |
+        project1:path/to/project1
+        project2:path/to/project2
+        project3:path/to/project3
+      diffOnly: true
 ```
