@@ -15811,9 +15811,12 @@ const postMessage_1 = __nccwpck_require__(9717);
 async function run() {
     try {
         const baseBranch = core.getInput('base') || 'main';
+        const baseBranchDir = core.getInput('basePath') ?? '/tmp/base';
+        const targetBranchDir = core.getInput('branchPath') ?? process.cwd();
         const group = core.getInput('group');
         const commands = core.getInput('commands').split('\n');
         const github_token = core.getInput('token');
+        const diffOnly = core.getInput('diffOnly');
         const projects = core
             .getInput('projects')
             .split('\n')
@@ -15822,11 +15825,16 @@ async function run() {
             path: projectStr.split(':')[1]
         }));
         const folders = {
-            branch: process.cwd(),
-            base: '/tmp/base'
+            branch: targetBranchDir,
+            base: baseBranchDir
         };
-        await (0, pull_branch_1.pullBranch)(github_token, baseBranch, folders.base);
-        await (0, prepare_1.prepare)(commands, folders);
+        if (diffOnly === 'false') {
+            await (0, pull_branch_1.pullBranch)(github_token, baseBranch, folders.base);
+            await (0, prepare_1.prepare)(commands, folders);
+        }
+        else {
+            core.info('Skipping base branch pull and prepare since diffOnly is true. You are expected to produce the coverage-summary.json files yourself before this action.');
+        }
         const summaries = await (0, coverage_1.computeCoverage)(projects, folders);
         core.debug(`Computed coverage:\n${JSON.stringify(summaries)}`);
         await (0, postMessage_1.postMessage)(github_token, summaries, group);

@@ -11,6 +11,14 @@ inputs:
     description: 'Base branch to compare current branch to'
     required: false
     default: 'main'
+  basePath:
+    description: 'Base branch root directory'
+    required: false
+    default: '/tmp/base'
+  branchPath:
+    description: 'Target branch root directory'
+    required: false
+    default: '.'
   group:
     description: 'Group will help isolate actions comments'
     required: false
@@ -23,7 +31,12 @@ inputs:
     required: true
   commands:
     description: 'Script to run in both branch root to generate projects coverage-summary.json'
-    required: true
+    required: false
+    default: ''
+  diffOnly:
+    description: 'Only run diff. Will not pull base branch nor run commands'
+    required: false
+    default: false
 
 runs:
   using: node20

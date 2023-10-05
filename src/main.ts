@@ -11,9 +11,12 @@ import { postMessage } from './postMessage'
 export async function run(): Promise<void> {
   try {
     const baseBranch = core.getInput('base') || 'main'
+    const baseBranchDir = core.getInput('basePath') ?? '/tmp/base'
+    const targetBranchDir = core.getInput('branchPath') ?? process.cwd()
     const group = core.getInput('group')
     const commands = core.getInput('commands').split('\n')
     const github_token = core.getInput('token')
+    const diffOnly = core.getInput('diffOnly') as 'true' | 'false'
     const projects = core
       .getInput('projects')
       .split('\n')
@@ -26,13 +29,19 @@ export async function run(): Promise<void> {
       )
 
     const folders = {
-      branch: process.cwd(),
-      base: '/tmp/base'
+      branch: targetBranchDir,
+      base: baseBranchDir
     }
 
-    await pullBranch(github_token, baseBranch, folders.base)
+    if (diffOnly === 'false') {
+      await pullBranch(github_token, baseBranch, folders.base)
 
-    await prepare(commands, folders)
+      await prepare(commands, folders)
+    } else {
+      core.info(
+        'Skipping base branch pull and prepare since diffOnly is true. You are expected to produce the coverage-summary.json files yourself before this action.'
+      )
+    }
 
     const summaries = await computeCoverage(projects, folders)
 
