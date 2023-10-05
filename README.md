@@ -29,8 +29,6 @@ jobs:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
-        with:
-          cache: "yarn" # using yarn in this example, but it's just a matter of choice
 
       # The important part is below
       - uses: holynoodle/monorepo-coverage-diff@v6
@@ -102,8 +100,6 @@ steps:
 
   - name: Use Node.js ${{ matrix.node-version }}
     uses: actions/setup-node@v3
-    with:
-      node-version: ${{ matrix.node-version }}
 
   - run: yarn --frozen-lockfile && yarn build && yarn ci:unit
     working-directory: ./base
