@@ -1,4 +1,5 @@
 import * as core from '@actions/core'
+import * as path from 'path'
 import { pullBranch } from './pull_branch'
 import { prepare } from './prepare'
 import { Project, computeCoverage } from './coverage'
@@ -29,9 +30,11 @@ export async function run(): Promise<void> {
       )
 
     const folders = {
-      branch: targetBranchDir,
-      base: baseBranchDir
+      branch: path.join(process.cwd(), targetBranchDir),
+      base: path.join(process.cwd(), baseBranchDir)
     }
+
+    core.info(`Folders:\n${JSON.stringify(folders)}`)
 
     if (diffOnly === 'false') {
       await pullBranch(github_token, baseBranch, folders.base)

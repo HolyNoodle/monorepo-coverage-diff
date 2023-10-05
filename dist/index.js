@@ -15800,6 +15800,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = void 0;
 const core = __importStar(__nccwpck_require__(2186));
+const path = __importStar(__nccwpck_require__(1017));
 const pull_branch_1 = __nccwpck_require__(7993);
 const prepare_1 = __nccwpck_require__(7294);
 const coverage_1 = __nccwpck_require__(9084);
@@ -15825,9 +15826,10 @@ async function run() {
             path: projectStr.split(':')[1]
         }));
         const folders = {
-            branch: targetBranchDir,
-            base: baseBranchDir
+            branch: path.join(process.cwd(), targetBranchDir),
+            base: path.join(process.cwd(), baseBranchDir)
         };
+        core.info(`Folders:\n${JSON.stringify(folders)}`);
         if (diffOnly === 'false') {
             await (0, pull_branch_1.pullBranch)(github_token, baseBranch, folders.base);
             await (0, prepare_1.prepare)(commands, folders);
