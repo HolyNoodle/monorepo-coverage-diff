@@ -98,7 +98,7 @@ steps:
       ref: main
       path: ./base
 
-  - name: Use Node.js ${{ matrix.node-version }}
+  - name: Use Node.js
     uses: actions/setup-node@v3
 
   - run: yarn --frozen-lockfile && yarn build && yarn ci:unit
